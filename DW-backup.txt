@@ -1,0 +1,70 @@
+//darkweb
+
+
+client.on('message', async message => {
+
+    //introduction
+    if (message.content.startsWith(`${prefix}introduction`)) {
+        let startEmbed = new MessageEmbed()
+            .addField("@anonymous: ", "Witam wszystkich obywateli i przyjezdnych! Z tej strony Naczelny Hacker Wyspowicz! 🕵️‍♂️ Chcecie być tak samo anonimowi jak ja? Nic w tym trudnego nie ma! Psst... Dostałem cynk, że <@714559507132580010> ma tam coś nowego pod bluzą.. Sprawdźcie sami 🤫 `?komendy`")
+            .setFooter('💻DarkWEB System v1.0 | Kazik#2642')
+        let introductionChannel = client.channels.cache.get('714919651490136087')
+        introductionChannel.send(startEmbed);
+    }
+
+    //clear darkweb
+
+    if (message.content.startsWith(`${prefix}dw`)) {
+
+        if (message.channel.type !== 'dm') 
+        
+        {
+
+            let dmEmbed = new MessageEmbed()
+                .setDescription('Użyj tej komendy w wiadomości prywatnej do <@714559507132580010>! Zapobiega to metagamingowi!')
+                .setFooter('💻 DarkWEB System v1.0 | Kazik#2642')
+            message.author.send(dmEmbed);
+            message.delete();
+
+        }
+        
+    
+        else {
+
+            let propozycjaEmbed = new MessageEmbed();
+            propozycjaEmbed.setDescription('```Napisz swojego anonimowego tweeta:```');
+            propozycjaEmbed.setFooter("💻 DarkWEB System v1.0 | Kazik#2642")
+            propozycjaEmbed.setColor(kolory.black);
+
+            message.author.send(propozycjaEmbed);
+
+
+            let filter = m => !m.author.bot;
+            const collector = message.channel.createMessageCollector(filter, { time: 15000 });
+
+            let counter = 0;
+            let destination = client.channels.cache.get('714919651490136087');
+
+            collector.on('collect', (message, col) => {
+                console.log("Skolekcjonowana wiadomość: " + message.content);
+                counter++;
+                if (counter === 1) collector.stop();
+                if (destination) {
+                    if (message.content.startsWith(`${prefix}colstop`) && (message.author.id === m.author.id)) {
+                        console.log('Zatrzymuję >> collector <<');
+                        collector.stop();
+                    }
+                    const anonymousEmbed = new MessageEmbed()
+                        .addField('@anonymous:', `${message.content}`)
+                        .setFooter('💻DarkWEB System v1.0');
+                    destination.send(anonymousEmbed);
+                }
+
+            });
+            collector.on('end', collected => {
+                console.log(collected.size);
+
+            });
+        };
+    };
+});
